@@ -1,4 +1,5 @@
 node_modules/
 .vscode/
+*.code-workspace
 config/*.json*
 .env
