@@ -12,9 +12,7 @@ module.exports = new class DatabaseService extends Service {
 		this.mongoURL = `mongodb://${conf('db.host')}/${conf('db.database')}?authSource=admin`;
 		this.client = null;
 		this.db = null;
-
 		this.tunnel = null;
-
 		this.ready = false;
 
 	}
@@ -25,7 +23,7 @@ module.exports = new class DatabaseService extends Service {
 		this.db.on('open', this.onConnected.bind(this));
 		this.db.on('close', this.onDisconnected.bind(this));
 		this.db.on('reconnected', this.onConnected.bind(this));
-		
+
 		return this;
 	}
 
@@ -79,6 +77,5 @@ module.exports = new class DatabaseService extends Service {
 		if (this.tunnel.listening)
 			await this.tunnel.close();
 	}
-
 
 }();

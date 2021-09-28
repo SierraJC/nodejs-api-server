@@ -16,7 +16,7 @@ new class Main extends RootInterface {
 			app = express(),
 			routes = require('./routes'),
 			// router = express.Router(),
-			db = pluginManager.get('mongodb');
+			db = pluginManager.get('database');
 
 		await db.connect();
 
