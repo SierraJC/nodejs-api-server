@@ -1,6 +1,5 @@
 require('dotenv').config();
 const convict = require('convict');
-const { model } = require('mongoose');
 
 const config = convict({
 	env: {
@@ -23,9 +22,9 @@ const config = convict({
 		host: { format: '*', default: false },
 		username: { format: '*', default: false },
 		password: { format: '*', default: false, sensitive: true },
+		database: { format: '*', default: false },
 		tunnel: { format: '*', default: null },
 	},
-	// todo: declare config schema?
 });
 
 config.loadFile(`config/${config.get('env')}.json5`);
@@ -38,4 +37,4 @@ module.exports = function (prop, value) {
 	} else {
 		return config.get(prop);
 	}
-}
+};
