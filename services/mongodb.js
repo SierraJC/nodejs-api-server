@@ -22,21 +22,26 @@ module.exports = new class DatabaseService extends Service {
 	async init() {
 		this.db = mongoose.connection;
 		this.db.on('error', this.error);
-		this.db.once('open', () => this.onConnected());
+		this.db.on('open', this.onConnected.bind(this));
+		this.db.on('close', this.onDisconnected.bind(this));
+		this.db.on('reconnected', this.onConnected.bind(this));
+		
 		return this;
 	}
 
-	unload() {
+	async unload() {
+		await this.disconnect();
+		return true;
 	}
 
 	onConnected() {
 		this.ready = true;
-		this.log(`Connected successfully to MongoDB @ ${conf('db.host')}/${conf('db.database')}`);
+		this.log(`Connected to MongoDB @ ${conf('db.host')} -> ${conf('db.database')}`);
 	}
 
 	onDisconnected() {
-		this.ready = true;
-		this.log('disconnected from MongoDB');
+		this.ready = false;
+		this.log('Disconnected from MongoDB');
 	}
 
 	connected() {
@@ -58,18 +63,20 @@ module.exports = new class DatabaseService extends Service {
 		}
 
 		this.client = await mongoose.connect(this.mongoURL, {
-			useNewUrlParser: true, useUnifiedTopology: true,
+			useNewUrlParser: true,
+			useUnifiedTopology: true,
+
 			user: conf('db.username'), pass: conf('db.password')
 		});
 
-
-		return true;
+		return this.client;
 	}
 
 	async disconnect() {
 		this.ready = false;
-		await this.client.disconnect();
-		if (this.tunnel.connected)
+		if (this.connected())
+			await this.client.disconnect();
+		if (this.tunnel.listening)
 			await this.tunnel.close();
 	}
 

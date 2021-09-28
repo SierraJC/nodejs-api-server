@@ -59,9 +59,9 @@ class PluginLoader extends RootInterface {
 		return true;
 	}
 
-	unloadAll(pathName = './libs/') {
+	unloadAll(pathName = './services/') {
 		Object.keys(this.plugins).forEach(key => {
-			if (!this.plugins[key].manuallyLoaded && this.plugins[key].initialized && this.plugins[key].path.startsWith(pathName))
+			if (!this.plugins[key].manuallyLoaded && this.plugins[key]._initialized && this.plugins[key].path.startsWith(pathName))
 				this.unload(this.plugins[key].path);
 		});
 	}
