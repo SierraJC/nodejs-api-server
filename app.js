@@ -1,22 +1,21 @@
 global.conf = require('./config/config.js');
 const RootInterface = require('./_interface');
-const pluginManager = require('./plugin_loader');
+const PluginLoader = require('./plugin_loader');
 
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 
-new class Main extends RootInterface {
+global.App = new class Main extends RootInterface {
 	async main() {
-
-		global.pluginManager = pluginManager;
-		pluginManager.loadAll('./services/');
+		this.Services = new PluginLoader();
+		await this.Services.loadAll('./services/');
 
 		const
 			app = express(),
-			routes = require('./routes'),
+			routes = require('./routes/_router.js'),
 			// router = express.Router(),
-			db = pluginManager.get('database');
+			db = this.Services.get('database');
 
 		await db.connect();
 
@@ -68,7 +67,7 @@ new class Main extends RootInterface {
 	}
 	exit() {
 		try {
-			pluginManager.unloadAll('./services/');
+			Services.unloadAll('./services/');
 		} catch (err) {
 			console.error('Error during plugin unloading. Bad luck!');
 			console.error(err);
