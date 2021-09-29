@@ -17,6 +17,7 @@ module.exports = {
 		'no-undef': 'off',
 		'linebreak-style': ['error', 'windows'],
 		'quotes': ['error', 'single'],
-		'semi': ['error', 'always']
+		'semi': ['error', 'always'],
+		'no-unused-vars': ['error', { "argsIgnorePattern": ["^_","next"] }]
 	}
 };
