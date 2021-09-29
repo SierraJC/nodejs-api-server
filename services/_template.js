@@ -7,7 +7,7 @@ module.exports = new class Template extends Service {
 	}
 
 	async init(_opts = {}) {
-		return this;
+		return true;
 	}
 
 	async unload() {

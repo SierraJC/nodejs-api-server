@@ -3,15 +3,13 @@ const conf = require('../../config/config.js');
 
 const express = require('express');
 const router = express.Router();
-
 const axios = require('axios');
-
 
 module.exports = new class TwithAuth extends RouteLib {
 	constructor() {
 		super();
 		this._priority = 50; // 1 (High) - 100 (Low)
-
+		this.root = '/twitch/auth';
 
 		this.twitchConfig = conf('twitch');
 
@@ -105,7 +103,7 @@ module.exports = new class TwithAuth extends RouteLib {
 			res.send(req.session);
 		});
 
-		app.use('/twitch/auth', router);
+		app.use(this.root, router);
 		return true;
 	}
 

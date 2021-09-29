@@ -6,11 +6,11 @@ const router = express.Router();
 
 const auth = require('../services/authorization');
 
-
 module.exports = new class Template extends RouteLib {
 	constructor() {
 		super();
 		this._priority = 50; // 1 (High) - 100 (Low)
+		this.root = '/protected';
 	}
 
 	async init(opts = {}) {
@@ -20,7 +20,7 @@ module.exports = new class Template extends RouteLib {
 			res.send('content');
 		});
 
-		app.use('/protected', router);
+		app.use(this.root, router);
 		return true;
 	}
 

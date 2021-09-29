@@ -10,13 +10,14 @@ module.exports = new class Template extends RouteLib {
 	constructor() {
 		super();
 		this._priority = 50; // 1 (High) - 100 (Low)
+		this.root = '/tempate';
 	}
 
 	async init(opts) {
 		let app = opts.app;
 		// router.get('/', async (req, res, next) => {	});
 		// router.get('/', auth.jwtRequired, async (req, res, next) => { });
-		app.use('/template', router);
+		app.use(this.root, router);
 		return true;
 	}
 
