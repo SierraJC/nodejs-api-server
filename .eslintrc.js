@@ -18,6 +18,6 @@ module.exports = {
 		'linebreak-style': ['error', 'windows'],
 		'quotes': ['error', 'single'],
 		'semi': ['error', 'always'],
-		'no-unused-vars': ['error', { "argsIgnorePattern": ["^_","next"] }]
+		'no-unused-vars': ['error', { "argsIgnorePattern": "^_|^next$", "varsIgnorePattern": "^conf$" }]
 	}
 };

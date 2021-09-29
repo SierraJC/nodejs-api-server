@@ -25,7 +25,7 @@ module.exports = new class DatabaseService extends Service {
 		this.db.on('close', this.onDisconnected.bind(this));
 		this.db.on('reconnected', this.onConnected.bind(this));
 
-		return this;
+		return this.connect();
 	}
 
 	async unload() {

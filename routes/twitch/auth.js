@@ -5,6 +5,10 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
+const twitchViewer = require('../../models/twitchViewer');
+
+//todo: expired token refresh
+
 module.exports = new class TwithAuth extends RouteLib {
 	constructor() {
 		super();
@@ -25,7 +29,7 @@ module.exports = new class TwithAuth extends RouteLib {
 			client_id: this.twitchConfig.clientId,
 			redirect_uri: this.twitchConfig.redir,
 			scope: Object.keys(this.scopes).filter((scope) => this.scopes[scope]).join(' '),
-			force_verify: true,
+			force_verify: conf('env') == 'dev',
 		});
 
 		this.ttvTokenVerify = 'https://id.twitch.tv/oauth2/token';
@@ -72,9 +76,9 @@ module.exports = new class TwithAuth extends RouteLib {
 					if (reqUser) {
 						// eslint-disable-next-line require-atomic-updates
 						req.session.twitch = {
-							_id: Number(reqUser.id),
 							token: reqToken.data.access_token,
 							refresh: reqToken.data.refresh_token,
+							expires_in: reqToken.data.expires_in,
 							user: reqUser
 						};
 						// res.send(reqUser);
@@ -83,7 +87,8 @@ module.exports = new class TwithAuth extends RouteLib {
 							if (state.redir)
 								res.redirect(state.redir);
 							else
-								res.send(reqUser);
+								res.redirect(this.root + '/status');
+							// res.send(reqUser);
 						}
 					} else {
 						const error = new Error('Invalid twitch token');
@@ -99,8 +104,19 @@ module.exports = new class TwithAuth extends RouteLib {
 
 		});
 
-		router.get('/status', (req, res) => {
-			res.send(req.session);
+		router.get('/status', async (req, res, next) => {
+
+			if (req.session.twitch) {
+				let user = req.session.twitch.user;
+				if (user) {
+					let begin = Date.now();
+					let botUser = await twitchViewer.findOne({ _id: user.id });
+					let end = Date.now();
+					res.send({ ... { benchmark: (end - begin) }, ...{ botUser: botUser._doc }, ... { cookie: req.session.twitch } });
+				}
+			} else {
+				res.redirect(this.root);
+			}
 		});
 
 		app.use(this.root, router);

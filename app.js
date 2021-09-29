@@ -17,7 +17,7 @@ global.App = new class Main extends RootInterface {
 			routes = require('./routes/_router.js'),
 			db = this.Services.get('database');
 
-		await db.connect();
+		//await db.connect();
 
 		app.set('trust proxy', 1); // trust first proxy
 		app.set('x-powered-by', false);
@@ -29,6 +29,7 @@ global.App = new class Main extends RootInterface {
 			secret: conf('app.secret'),
 			resave: false,
 			saveUninitialized: false,
+			name: 'sp.sesh',
 			cookie: {
 				domain: conf('app.cookieDomain'),
 				maxAge: 5 * 60 * 1000, // 5 minutes

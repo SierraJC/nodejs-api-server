@@ -17,7 +17,7 @@ module.exports = new class Template extends RouteLib {
 		let app = opts.app;
 
 		router.get('/', auth.jwtRequired, async (req, res) => {
-			res.send('content');
+			res.send({ secret: 'this is my secret' });
 		});
 
 		app.use(this.root, router);
