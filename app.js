@@ -10,18 +10,18 @@ global.App = new class Main extends RootInterface {
 	async main() {
 		this.Services = new PluginLoader();
 		await this.Services.loadAll('./services/');
+		// todo: abandon plugin loader unload feature? change loadAll to return unique instance per dir loaded
 
 		const
 			app = express(),
 			routes = require('./routes/_router.js'),
-			// router = express.Router(),
 			db = this.Services.get('database');
 
 		await db.connect();
 
 		app.set('trust proxy', 1); // trust first proxy
-		app.set('x-powered-by', false); // trust first proxy
-		app.disable('x-powered-by');
+		app.set('x-powered-by', false);
+
 		app.use(express.json());
 		app.use(express.urlencoded({ extended: false }));
 

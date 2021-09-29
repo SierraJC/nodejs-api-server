@@ -6,7 +6,7 @@ module.exports = new class Template extends Service {
 		this._priority = 50; // 1 (High) - 100 (Low)
 	}
 
-	async init(opts = {}) {
+	async init(_opts = {}) {
 		return this;
 	}
 

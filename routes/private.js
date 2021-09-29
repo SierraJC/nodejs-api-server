@@ -4,7 +4,8 @@ const conf = require('../config/config.js');
 const express = require('express');
 const router = express.Router();
 
-// const auth = require('../services/authorization');
+const auth = require('../services/authorization');
+
 
 module.exports = new class Template extends RouteLib {
 	constructor() {
@@ -12,11 +13,14 @@ module.exports = new class Template extends RouteLib {
 		this._priority = 50; // 1 (High) - 100 (Low)
 	}
 
-	async init(opts) {
+	async init(opts = {}) {
 		let app = opts.app;
-		// router.get('/', async (req, res, next) => {	});
-		// router.get('/', auth.jwtRequired, async (req, res, next) => { });
-		app.use('/template', router);
+
+		router.get('/', auth.jwtRequired, async (req, res) => {
+			res.send('content');
+		});
+
+		app.use('/protected', router);
 		return true;
 	}
 
