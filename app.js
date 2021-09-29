@@ -73,7 +73,7 @@ global.App = new class Main extends RootInterface {
 	}
 	exit() {
 		try {
-			Services.unloadAll('./services/');
+			this.Services.unloadAll('./services/');
 		} catch (err) {
 			console.error('Error during plugin unloading. Bad luck!');
 			console.error(err);

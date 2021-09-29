@@ -6,13 +6,13 @@ const conf = require('./config/config.js');
 module.exports = class RootInterface {
 	constructor() {
 		if (conf && conf('env') == 'prod')
-			this._logDateFormat = 'dd/mm HH:MM:ss';
-		this.prependStr = `${this._logDateFormat ? dateFormat(new Date(), this._logDateFormat) + ' ' : ''}[${this.constructor.name}]`;
+			this._logDateFormat = 'dd/MM HH:mm:ss';
+		this.prependStr = () => `${this._logDateFormat ? dateFormat(new Date(), this._logDateFormat) + ' ' : ''}[${this.constructor.name}]`;
 
-		this.log = console.log.bind(console, this.prependStr);
-		this.debug = console.debug.bind(console, this.prependStr);
-		this.warn = console.warn.bind(console, this.prependStr);
-		this.error = console.error.bind(console, this.prependStr);
+		this.log = console.log.bind(console, this.prependStr());
+		this.debug = console.debug.bind(console, this.prependStr());
+		this.warn = console.warn.bind(console, this.prependStr());
+		this.error = console.error.bind(console, this.prependStr());
 
 	}
 
