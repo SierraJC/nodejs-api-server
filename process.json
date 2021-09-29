@@ -4,10 +4,10 @@
 	"watch": true,
 	"max_memory_restart": "300M",
 	"max_restarts": 10,
-	"watch_delay": 300000,
+	"watch_delay": 60000,
 	"ignore_watch": ["logs"],
 	"wait_ready": true,
-	"listen_timeout": 30000,
+	"listen_timeout": 5000,
 	"_log_date_format": "DD/MM HH:mm:SS",
 	"error_file": "logs/error.log",
 	"out_file": "logs/output.log"

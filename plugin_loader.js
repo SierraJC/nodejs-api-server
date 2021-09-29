@@ -22,7 +22,7 @@ module.exports = class PluginLoader extends RootInterface {
 		this._loadPath = '';
 	}
 
-	async loadAll(pluginsPath) {
+	async loadAll(pluginsPath, passData = {}) {
 		this._loadPath = pluginsPath;
 		// await fs.readdirSync(pathName).forEach((file) => {
 		// 	if (!file.startsWith('_') && path.extname(file).toLowerCase() === '.js')
@@ -43,7 +43,7 @@ module.exports = class PluginLoader extends RootInterface {
 
 		// Now initialize them all
 		for (const plugin of sorted) {
-			this.plugins[plugin]._initialized = await this.plugins[plugin].init();
+			this.plugins[plugin]._initialized = await this.plugins[plugin].init(passData);
 		}
 
 		this._loaded = true;

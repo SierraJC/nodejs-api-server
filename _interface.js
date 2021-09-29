@@ -1,6 +1,7 @@
 // const dateFormat = require('dateformat');
 const fs = require('fs');
 const dateFormat = require('date-fns/format');
+const conf = require('./config/config.js');
 
 module.exports = class RootInterface {
 	constructor() {

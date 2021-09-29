@@ -12,6 +12,11 @@ const config = convict({
 		host: { format: '*', default: false },
 		port: { format: 'port', default: false },
 		secret: { format: '*', default: false, sensitive: true },
+		cookieDomain: { format: '*', default: false },
+		jwt: {
+			secret: { format: '*', default: false, sensitive: true },
+			algorithms: { format: '*', default: false }
+		}
 	},
 	twitch: {
 		clientId: { format: '*', default: false },

@@ -1,4 +1,4 @@
-global.conf = require('./config/config.js');
+const conf = require('./config/config.js');
 const RootInterface = require('./_interface');
 const PluginLoader = require('./plugin_loader');
 
@@ -21,6 +21,7 @@ global.App = new class Main extends RootInterface {
 
 		app.set('trust proxy', 1); // trust first proxy
 		app.set('x-powered-by', false); // trust first proxy
+		app.disable('x-powered-by');
 		app.use(express.json());
 		app.use(express.urlencoded({ extended: false }));
 
@@ -28,7 +29,12 @@ global.App = new class Main extends RootInterface {
 			secret: conf('app.secret'),
 			resave: false,
 			saveUninitialized: false,
-			cookie: conf('env') == 'prod' ? { domain: 'sierrapresents.live', secure: true } : { domain: conf('app.host'), secure: false },
+			cookie: {
+				domain: conf('app.cookieDomain'),
+				maxAge: 5 * 60 * 1000, // 5 minutes
+				secure: conf('env') == 'prod',
+				httpOnly: true
+			},
 			store: MongoStore.create({
 				client: db.client.connection.getClient(),
 				//dbName: 'sessions'
@@ -36,7 +42,7 @@ global.App = new class Main extends RootInterface {
 			})
 		}));
 
-		routes(app);
+		await routes(app);
 
 		// Error handler
 		app.use((req, res, next) => {
@@ -49,9 +55,9 @@ global.App = new class Main extends RootInterface {
 			res.status(error.status || 500).send({
 				status: error.status || 500,
 				message: error.message || 'Internal Server Error',
-				stack: conf('env') == 'dev' ? error.stack : undefined
+				// stack: conf('env') == 'dev' ? error.stack : undefined
 			});
-			this.error(error);
+			this.error(`${error.status} ${error.message}: ${req.url}`);
 			next();
 		});
 

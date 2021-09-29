@@ -1,4 +1,5 @@
 const Service = require('./_interface');
+const conf = require('../config/config.js');
 
 const fs = require('fs');
 const mongoose = require('mongoose');
