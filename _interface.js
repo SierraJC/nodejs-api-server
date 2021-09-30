@@ -10,6 +10,7 @@ module.exports = class RootInterface {
 		this.prependStr = () => `${this._logDateFormat ? dateFormat(new Date(), this._logDateFormat) + ' ' : ''}[${this.constructor.name}]`;
 
 		this.log = console.log.bind(console, this.prependStr());
+		this.info = console.info.bind(console, this.prependStr());
 		this.debug = console.debug.bind(console, this.prependStr());
 		this.warn = console.warn.bind(console, this.prependStr());
 		this.error = console.error.bind(console, this.prependStr());

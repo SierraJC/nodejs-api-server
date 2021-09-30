@@ -64,7 +64,9 @@ global.App = new class Main extends RootInterface {
 				message: error.message || 'Internal Server Error',
 				// stack: conf('env') == 'dev' ? error.stack : undefined
 			});
-			this.error(`${error.status} ${error.message}: ${req.url}`);
+			this.warn(`${error.status} ${error.message}: ${req.url}`);
+			// if (conf('env') == 'dev')
+			// this.error(error.stack);
 			next();
 		});
 

@@ -5,9 +5,15 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
+const utils = require('../../utils');
+const { URL } = require('url');
+
 const twitchViewer = require('../../models/twitchViewer');
 
+
 //todo: expired token refresh
+
+
 
 module.exports = new class TwithAuth extends RouteLib {
 	constructor() {
@@ -42,20 +48,35 @@ module.exports = new class TwithAuth extends RouteLib {
 
 		router.get('/', async (req, res, next) => {
 			if (req.query.error && req.query.error_description) {
+				// Error, user probably denied the auth on twitch website
 				if (req.query.state) {
-					let state = JSON.parse(req.query.state);
-					res.redirect(state.redir);
+					try {
+						let state = JSON.parse(req.query.state);
+						let redir = new URL(state.redir);
+						redir.searchParams.append('success', false);
+						redir.searchParams.append('error', req.query.error);
+						redir.searchParams.append('error_description', req.query.error_description);
+						res.redirect(redir);
+					} catch (err) {
+						next(utils.makeError(400, 'Invalid state'));
+					}
 				} else {
+					// No original state, force reauthentication attempt
 					res.redirect(this.ttvAuthURL + '&' + new URLSearchParams({ state: JSON.stringify(req.query) }));
 				}
+
 			} else if (!req.query.code) {
-				if (req.session.twitch) {
-					if (req.query.redir)
-						res.redirect(req.query.redir);
-					else
-						res.send(req.session.twitch.user);
-				} else
-					res.redirect(this.ttvAuthURL + '&' + new URLSearchParams({ state: JSON.stringify(req.query) }));
+				if (!req.query.redir || !utils.isValidURL(req.query.redir)) {
+					next(utils.makeError(400, 'Invalid/empty redir parameter'));
+				} else {
+					if (req.session.twitch) {
+						if (req.query.redir)
+							res.redirect(req.query.redir);
+						else
+							res.send(req.session.twitch.user);
+					} else
+						res.redirect(this.ttvAuthURL + '&' + new URLSearchParams({ state: JSON.stringify(req.query) }));
+				}
 			} else {
 
 				let reqData = {
@@ -90,27 +111,20 @@ module.exports = new class TwithAuth extends RouteLib {
 							expires_in: reqToken.data.expires_in,
 							user: reqUser
 						};
-						// res.send(reqUser);
 						if (req.query.state) {
 							let state = JSON.parse(req.query.state);
-							if (state.redir)
-								res.redirect(state.redir);
-							else
+							if (state.redir) {
+								let redir = new URL(state.redir);
+								redir.searchParams.append('success', true);
+								res.redirect(redir);
+							} else
 								res.redirect(this.root + '/status');
-							// res.send(reqUser);
-						} else {
+						} else
 							res.send({ status: 200, message: 'You are now logged in' });
-						}
-					} else {
-						const error = new Error('Invalid twitch token');
-						error.status = 401;
-						next(error);
-					}
-				} else {
-					const error = new Error('Invalid authentication code');
-					error.status = 401;
-					next(error);
-				}
+					} else
+						next(utils.makeError(401, 'Invalid twitch token'));
+				} else
+					next(utils.makeError(401, 'Invalid authentication code'));
 			}
 
 		});
