@@ -29,7 +29,7 @@ module.exports = new class TwithAuth extends RouteLib {
 			client_id: this.twitchConfig.clientId,
 			redirect_uri: this.twitchConfig.redir,
 			scope: Object.keys(this.scopes).filter((scope) => this.scopes[scope]).join(' '),
-			force_verify: conf('env') == 'dev',
+			force_verify: true//conf('env') == 'dev',
 		});
 
 		this.ttvTokenVerify = 'https://id.twitch.tv/oauth2/token';
@@ -41,10 +41,19 @@ module.exports = new class TwithAuth extends RouteLib {
 		let app = opts.app;
 
 		router.get('/', async (req, res, next) => {
-
-			if (!req.query.code) {
+			if (req.query.error && req.query.error_description) {
+				if (req.query.state) {
+					let state = JSON.parse(req.query.state);
+					res.redirect(state.redir);
+				} else {
+					res.redirect(this.ttvAuthURL + '&' + new URLSearchParams({ state: JSON.stringify(req.query) }));
+				}
+			} else if (!req.query.code) {
 				if (req.session.twitch) {
-					res.send(req.session.twitch.user);
+					if (req.query.redir)
+						res.redirect(req.query.redir);
+					else
+						res.send(req.session.twitch.user);
 				} else
 					res.redirect(this.ttvAuthURL + '&' + new URLSearchParams({ state: JSON.stringify(req.query) }));
 			} else {
@@ -89,15 +98,17 @@ module.exports = new class TwithAuth extends RouteLib {
 							else
 								res.redirect(this.root + '/status');
 							// res.send(reqUser);
+						} else {
+							res.send({ status: 200, message: 'You are now logged in' });
 						}
 					} else {
 						const error = new Error('Invalid twitch token');
-						error.status = 500;
+						error.status = 401;
 						next(error);
 					}
 				} else {
 					const error = new Error('Invalid authentication code');
-					error.status = 500;
+					error.status = 401;
 					next(error);
 				}
 			}

@@ -5,6 +5,7 @@ const PluginLoader = require('./plugin_loader');
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const cors = require('cors');
 
 global.App = new class Main extends RootInterface {
 	async main() {
@@ -41,6 +42,11 @@ global.App = new class Main extends RootInterface {
 				//dbName: 'sessions'
 				collectionName: 'sessions'
 			})
+		}));
+
+		app.use(cors({
+			// app.options('*', cors({
+			origin: new RegExp('/' + conf('app.cookieDomain') + '$')
 		}));
 
 		await routes(app);
